@@ -15,12 +15,17 @@ namespace Notes.Web.Data
         {
         }
 
+        public DbSet<Asset> Assets { get; set; }
+        public DbSet<Note> Notes { get; set; }
+        public DbSet<Notebook> Notebooks { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<TagItem> TagItems { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            // Customize the ASP.NET Identity model and override the defaults if needed.
-            // For example, you can rename the ASP.NET Identity table names and more.
-            // Add your customizations after calling base.OnModelCreating(builder);
+
+            builder.Entity<TagItem>().HasIndex(ti => new { ti.ItemId, ti.ItemType, ti.TagId }).IsUnique();
         }
     }
 }
