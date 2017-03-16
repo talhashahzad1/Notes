@@ -38,7 +38,11 @@ gulp.task("vendorJs", ["copySourceMaps"], function () {
         "node_modules/jquery/dist/jquery.min.js",
         "node_modules/bootstrap-sass/assets/javascripts/bootstrap.min.js",
         "bower_components/jquery-validation/dist/jquery.validate.min.js",
-        "bower_components/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"
+        "bower_components/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js",
+        "node_modules/ace-builds/src-min/ace.js",
+        "node_modules/ace-builds/src-min/worker-html.js",
+        "node_modules/ace-builds/src-min/theme-github.js",
+        "node_modules/ace-builds/src-min/mode-markdown.js"
     ])
         .pipe(concat("vendor.js"))
         .pipe(gulp.dest("wwwroot/js"));
