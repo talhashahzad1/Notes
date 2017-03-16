@@ -80,6 +80,14 @@ namespace Notes.Web
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
+                    name: "note_route",
+                    template: "Notebooks/Details/{notebookId:int}/Notes/{action}/{id:int?}",
+                    defaults: new { Controller = "Notes", Action = "Details" });
+                routes.MapRoute(
+                    name: "asset_route",
+                    template: "Notes/{noteId:int}/Assets/{action}/{id:int?}",
+                    defaults: new { Controller = "Assets" });
+                routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });

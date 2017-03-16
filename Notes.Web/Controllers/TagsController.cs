@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Notes.Web.Data;
 using Notes.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Notes.Web.Controllers
 {
+    [Authorize]
     public class TagsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,13 +21,13 @@ namespace Notes.Web.Controllers
             _context = context;    
         }
 
-        // GET: Tags
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Tags.ToListAsync());
         }
 
-        // GET: Tags/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -42,16 +44,12 @@ namespace Notes.Web.Controllers
 
             return View(tag);
         }
-
-        // GET: Tags/Create
+        
         public IActionResult Create()
         {
             return View();
         }
-
-        // POST: Tags/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,CreatedAt")] Tag tag)
@@ -64,8 +62,7 @@ namespace Notes.Web.Controllers
             }
             return View(tag);
         }
-
-        // GET: Tags/Edit/5
+        
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -80,10 +77,7 @@ namespace Notes.Web.Controllers
             }
             return View(tag);
         }
-
-        // POST: Tags/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CreatedAt")] Tag tag)
@@ -115,8 +109,7 @@ namespace Notes.Web.Controllers
             }
             return View(tag);
         }
-
-        // GET: Tags/Delete/5
+        
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -133,8 +126,7 @@ namespace Notes.Web.Controllers
 
             return View(tag);
         }
-
-        // POST: Tags/Delete/5
+        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

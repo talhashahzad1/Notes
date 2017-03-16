@@ -7,26 +7,33 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Notes.Web.Data;
 using Notes.Web.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Notes.Web.Models.CoreViewModels;
 
 namespace Notes.Web.Controllers
 {
+    [Authorize]
     public class NotebooksController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public NotebooksController(ApplicationDbContext context)
+        public NotebooksController(ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager)
         {
-            _context = context;    
+            _context = context;
+            _userManager = userManager;
         }
-
-        // GET: Notebooks
+        
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Notebooks.Include(n => n.ApplicationUser).Include(n => n.Parent);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Notebooks/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -45,34 +52,30 @@ namespace Notes.Web.Controllers
 
             return View(notebook);
         }
-
-        // GET: Notebooks/Create
+        
         public IActionResult Create()
         {
-            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Id");
             ViewData["ParentId"] = new SelectList(_context.Notebooks, "Id", "ApplicationUserId");
             return View();
         }
-
-        // POST: Notebooks/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,CreatedAt,UpdatedAt,ApplicationUserId,ParentId")] Notebook notebook)
+        public async Task<IActionResult> Create(NotebookFormObject nfo)
         {
             if (ModelState.IsValid)
             {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                var notebook = nfo.ToNotebook();
+                notebook.ApplicationUser = user;
                 _context.Add(notebook);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Id", notebook.ApplicationUserId);
-            ViewData["ParentId"] = new SelectList(_context.Notebooks, "Id", "ApplicationUserId", notebook.ParentId);
-            return View(notebook);
+            ViewData["ParentId"] = new SelectList(_context.Notebooks, "Id", "ApplicationUserId", nfo.ParentId);
+            return View(nfo);
         }
-
-        // GET: Notebooks/Edit/5
+        
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -85,17 +88,13 @@ namespace Notes.Web.Controllers
             {
                 return NotFound();
             }
-            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Id", notebook.ApplicationUserId);
             ViewData["ParentId"] = new SelectList(_context.Notebooks, "Id", "ApplicationUserId", notebook.ParentId);
             return View(notebook);
         }
-
-        // POST: Notebooks/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,CreatedAt,UpdatedAt,ApplicationUserId,ParentId")] Notebook notebook)
+        public async Task<IActionResult> Edit(int id, Notebook notebook)
         {
             if (id != notebook.Id)
             {
@@ -122,12 +121,10 @@ namespace Notes.Web.Controllers
                 }
                 return RedirectToAction("Index");
             }
-            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Id", notebook.ApplicationUserId);
             ViewData["ParentId"] = new SelectList(_context.Notebooks, "Id", "ApplicationUserId", notebook.ParentId);
             return View(notebook);
         }
-
-        // GET: Notebooks/Delete/5
+        
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -146,8 +143,7 @@ namespace Notes.Web.Controllers
 
             return View(notebook);
         }
-
-        // POST: Notebooks/Delete/5
+        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

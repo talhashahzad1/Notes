@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Notes.Web.Data;
 using Notes.Web.Models;
+using Microsoft.AspNetCore.Authorization;
+using Notes.Web.Models.CoreViewModels;
 
 namespace Notes.Web.Controllers
 {
+    [Authorize]
     public class NotesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,15 +21,14 @@ namespace Notes.Web.Controllers
         {
             _context = context;    
         }
-
-        // GET: Notes
+        
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Notes.Include(n => n.Notebook);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Notes/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -44,32 +46,27 @@ namespace Notes.Web.Controllers
 
             return View(note);
         }
-
-        // GET: Notes/Create
+        
         public IActionResult Create()
         {
-            ViewData["NotebookId"] = new SelectList(_context.Notebooks, "Id", "ApplicationUserId");
             return View();
         }
-
-        // POST: Notes/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Body,CreatedAt,UpdatedAt,NotebookId")] Note note)
+        public async Task<IActionResult> Create(int notebookId, NoteFormObject nfo)
         {
             if (ModelState.IsValid)
             {
+                var note = nfo.ToNote();
+                note.NotebookId = notebookId;
                 _context.Add(note);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            ViewData["NotebookId"] = new SelectList(_context.Notebooks, "Id", "ApplicationUserId", note.NotebookId);
-            return View(note);
+            return View(nfo);
         }
-
-        // GET: Notes/Edit/5
+        
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -82,16 +79,12 @@ namespace Notes.Web.Controllers
             {
                 return NotFound();
             }
-            ViewData["NotebookId"] = new SelectList(_context.Notebooks, "Id", "ApplicationUserId", note.NotebookId);
             return View(note);
         }
-
-        // POST: Notes/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Body,CreatedAt,UpdatedAt,NotebookId")] Note note)
+        public async Task<IActionResult> Edit(int id, Note note)
         {
             if (id != note.Id)
             {
@@ -118,11 +111,9 @@ namespace Notes.Web.Controllers
                 }
                 return RedirectToAction("Index");
             }
-            ViewData["NotebookId"] = new SelectList(_context.Notebooks, "Id", "ApplicationUserId", note.NotebookId);
             return View(note);
         }
-
-        // GET: Notes/Delete/5
+        
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -140,8 +131,7 @@ namespace Notes.Web.Controllers
 
             return View(note);
         }
-
-        // POST: Notes/Delete/5
+        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

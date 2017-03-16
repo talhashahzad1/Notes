@@ -38,9 +38,7 @@ namespace Notes.Web.Controllers
             _smsSender = smsSender;
             _logger = loggerFactory.CreateLogger<ManageController>();
         }
-
-        //
-        // GET: /Manage/Index
+        
         [HttpGet]
         public async Task<IActionResult> Index(ManageMessageId? message = null)
         {
@@ -68,9 +66,7 @@ namespace Notes.Web.Controllers
             };
             return View(model);
         }
-
-        //
-        // POST: /Manage/RemoveLogin
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveLogin(RemoveLoginViewModel account)
@@ -88,16 +84,12 @@ namespace Notes.Web.Controllers
             }
             return RedirectToAction(nameof(ManageLogins), new { Message = message });
         }
-
-        //
-        // GET: /Manage/AddPhoneNumber
+        
         public IActionResult AddPhoneNumber()
         {
             return View();
         }
-
-        //
-        // POST: /Manage/AddPhoneNumber
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddPhoneNumber(AddPhoneNumberViewModel model)
@@ -116,9 +108,7 @@ namespace Notes.Web.Controllers
             await _smsSender.SendSmsAsync(model.PhoneNumber, "Your security code is: " + code);
             return RedirectToAction(nameof(VerifyPhoneNumber), new { PhoneNumber = model.PhoneNumber });
         }
-
-        //
-        // POST: /Manage/EnableTwoFactorAuthentication
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EnableTwoFactorAuthentication()
@@ -132,9 +122,7 @@ namespace Notes.Web.Controllers
             }
             return RedirectToAction(nameof(Index), "Manage");
         }
-
-        //
-        // POST: /Manage/DisableTwoFactorAuthentication
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DisableTwoFactorAuthentication()
@@ -148,9 +136,7 @@ namespace Notes.Web.Controllers
             }
             return RedirectToAction(nameof(Index), "Manage");
         }
-
-        //
-        // GET: /Manage/VerifyPhoneNumber
+        
         [HttpGet]
         public async Task<IActionResult> VerifyPhoneNumber(string phoneNumber)
         {
@@ -163,9 +149,7 @@ namespace Notes.Web.Controllers
             // Send an SMS to verify the phone number
             return phoneNumber == null ? View("Error") : View(new VerifyPhoneNumberViewModel { PhoneNumber = phoneNumber });
         }
-
-        //
-        // POST: /Manage/VerifyPhoneNumber
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> VerifyPhoneNumber(VerifyPhoneNumberViewModel model)
@@ -188,9 +172,7 @@ namespace Notes.Web.Controllers
             ModelState.AddModelError(string.Empty, "Failed to verify phone number");
             return View(model);
         }
-
-        //
-        // POST: /Manage/RemovePhoneNumber
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemovePhoneNumber()
@@ -207,17 +189,13 @@ namespace Notes.Web.Controllers
             }
             return RedirectToAction(nameof(Index), new { Message = ManageMessageId.Error });
         }
-
-        //
-        // GET: /Manage/ChangePassword
+        
         [HttpGet]
         public IActionResult ChangePassword()
         {
             return View();
         }
-
-        //
-        // POST: /Manage/ChangePassword
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
@@ -241,17 +219,13 @@ namespace Notes.Web.Controllers
             }
             return RedirectToAction(nameof(Index), new { Message = ManageMessageId.Error });
         }
-
-        //
-        // GET: /Manage/SetPassword
+        
         [HttpGet]
         public IActionResult SetPassword()
         {
             return View();
         }
-
-        //
-        // POST: /Manage/SetPassword
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetPassword(SetPasswordViewModel model)
@@ -275,8 +249,7 @@ namespace Notes.Web.Controllers
             }
             return RedirectToAction(nameof(Index), new { Message = ManageMessageId.Error });
         }
-
-        //GET: /Manage/ManageLogins
+        
         [HttpGet]
         public async Task<IActionResult> ManageLogins(ManageMessageId? message = null)
         {
@@ -299,9 +272,7 @@ namespace Notes.Web.Controllers
                 OtherLogins = otherLogins
             });
         }
-
-        //
-        // POST: /Manage/LinkLogin
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LinkLogin(string provider)
@@ -314,9 +285,7 @@ namespace Notes.Web.Controllers
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, _userManager.GetUserId(User));
             return Challenge(properties, provider);
         }
-
-        //
-        // GET: /Manage/LinkLoginCallback
+        
         [HttpGet]
         public async Task<ActionResult> LinkLoginCallback()
         {

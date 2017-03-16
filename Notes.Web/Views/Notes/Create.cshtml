@@ -27,26 +27,6 @@
         </div>
         <div id="NoteEditor"></div>
         <div class="form-group">
-            <label asp-for="CreatedAt" class="col-md-2 control-label"></label>
-            <div class="col-md-10">
-                <input asp-for="CreatedAt" class="form-control" />
-                <span asp-validation-for="CreatedAt" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="form-group">
-            <label asp-for="UpdatedAt" class="col-md-2 control-label"></label>
-            <div class="col-md-10">
-                <input asp-for="UpdatedAt" class="form-control" />
-                <span asp-validation-for="UpdatedAt" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="form-group">
-            <label asp-for="NotebookId" class="col-md-2 control-label"></label>
-            <div class="col-md-10">
-                <select asp-for="NotebookId" class ="form-control" asp-items="ViewBag.NotebookId"></select>
-            </div>
-        </div>
-        <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Create" class="btn btn-default" />
             </div>

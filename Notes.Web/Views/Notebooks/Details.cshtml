@@ -48,6 +48,7 @@
         </dd>
     </dl>
 </div>
+<a asp-controller="Notes" asp-action="Create" asp-route-notebookId="@Model.Id">Add Note</a>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
