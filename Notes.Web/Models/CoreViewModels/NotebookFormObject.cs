@@ -29,8 +29,24 @@ namespace Notes.Web.Models.CoreViewModels
             {
                 Name = Name,
                 Description = Description,
-                ParentId = ParentId
+                ParentId = ParentId,
+                UpdatedAt = DateTime.Now
             };
+        }
+
+        public Notebook CreateNotebook(ApplicationUser user)
+        {
+            var notebook = ToNotebook();
+            notebook.ApplicationUser = user;
+            return notebook;
+        }
+
+        public void UpdateNotebook(Notebook notebook)
+        {
+            notebook.UpdatedAt = DateTime.Now;
+            notebook.Name = Name;
+            notebook.Description = Description;
+            notebook.ParentId = ParentId;
         }
     }
 }

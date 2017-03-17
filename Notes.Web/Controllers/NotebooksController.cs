@@ -26,14 +26,13 @@ namespace Notes.Web.Controllers
             _userManager = userManager;
         }
         
-        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Notebooks.Include(n => n.ApplicationUser).Include(n => n.Parent);
-            return View(await applicationDbContext.ToListAsync());
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var notebooks = _context.Notebooks.Where(n => n.ApplicationUser == user).Include(n => n.Notes).OrderByDescending(n => n.UpdatedAt);
+            return View(await notebooks.ToListAsync());
         }
-
-        [AllowAnonymous]
+        
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -41,10 +40,7 @@ namespace Notes.Web.Controllers
                 return NotFound();
             }
 
-            var notebook = await _context.Notebooks
-                .Include(n => n.ApplicationUser)
-                .Include(n => n.Parent)
-                .SingleOrDefaultAsync(m => m.Id == id);
+            var notebook = await _context.Notebooks.Include(n => n.Notes).SingleOrDefaultAsync(m => m.Id == id);
             if (notebook == null)
             {
                 return NotFound();
@@ -55,7 +51,6 @@ namespace Notes.Web.Controllers
         
         public IActionResult Create()
         {
-            ViewData["ParentId"] = new SelectList(_context.Notebooks, "Id", "ApplicationUserId");
             return View();
         }
         
@@ -66,8 +61,7 @@ namespace Notes.Web.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(HttpContext.User);
-                var notebook = nfo.ToNotebook();
-                notebook.ApplicationUser = user;
+                var notebook = nfo.CreateNotebook(user);
                 _context.Add(notebook);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
@@ -88,41 +82,27 @@ namespace Notes.Web.Controllers
             {
                 return NotFound();
             }
-            ViewData["ParentId"] = new SelectList(_context.Notebooks, "Id", "ApplicationUserId", notebook.ParentId);
-            return View(notebook);
+            return View(new NotebookFormObject(notebook));
         }
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Notebook notebook)
+        public async Task<IActionResult> Edit(int id, NotebookFormObject nfo)
         {
-            if (id != notebook.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                try
+                var notebook = await _context.Notebooks.SingleOrDefaultAsync(n => n.Id == id);
+                if (notebook == null)
                 {
-                    _context.Update(notebook);
-                    await _context.SaveChangesAsync();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!NotebookExists(notebook.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction("Index");
+
+                nfo.UpdateNotebook(notebook);
+                _context.Update(notebook);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Details", new { Id = notebook.Id });
             }
-            ViewData["ParentId"] = new SelectList(_context.Notebooks, "Id", "ApplicationUserId", notebook.ParentId);
-            return View(notebook);
+            return View(nfo);
         }
         
         public async Task<IActionResult> Delete(int? id)
