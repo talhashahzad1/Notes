@@ -13,6 +13,8 @@ using Notes.Web.Data;
 using Notes.Web.Models;
 using Notes.Web.Services;
 using Notes.Web.Data.Repositories;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace Notes.Web
 {
@@ -56,6 +58,11 @@ namespace Notes.Web
 
             services.Configure<SetupUser>(Configuration.GetSection("SetupUser"));
 
+            services.Configure<MvcOptions>(options =>
+            {
+                options.Filters.Add(new RequireHttpsAttribute());
+            });
+
             services.AddMvc();
 
             // Add application services.
@@ -84,6 +91,10 @@ namespace Notes.Web
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
+            var options = new RewriteOptions().AddRedirectToHttps();
+
+            app.UseRewriter(options);
 
             app.UseStaticFiles();
 
