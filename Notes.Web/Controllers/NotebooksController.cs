@@ -29,10 +29,10 @@ namespace Notes.Web.Controllers
             _userManager = userManager;
         }
         
-        public async Task<IActionResult> Index(string order = "UpdatedAt", string direction = "DESC")
+        public async Task<IActionResult> Index(string order = "UpdatedAt", string direction = "DESC", int take = 20, int skip = 0)
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            return View(await _repo.List(user, order, direction));
+            return View(await _repo.List(user, new ListOptions(order, direction, take, skip)));
         }
         
         public async Task<IActionResult> Details(int? id)

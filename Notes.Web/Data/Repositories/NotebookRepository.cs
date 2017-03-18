@@ -19,10 +19,11 @@ namespace Notes.Web.Data.Repositories
             _dbSet = _db.Notebooks;
         }
 
-        public async Task<ICollection<Notebook>> List(ApplicationUser user, string order = "UpdatedAt", string direction = "DESC")
+        public async Task<ICollection<Notebook>> List(ApplicationUser user, ListOptions options)
         {
             var query = _dbSet.Where(n => n.ApplicationUser == user).Include(n => n.Notes)
-                .OrderQuery(order, direction);
+                .OrderQuery(options.Order, options.OrderDirection)
+                .Take(options.TakeCount).Skip(options.SkipCount);
 
             return await query.ToListAsync();
         }
@@ -36,24 +37,16 @@ namespace Notes.Web.Data.Repositories
             switch(order)
             {
                 case "UpdatedAt":
-                    return SwitchOrder(notebooks, direction, n => n.UpdatedAt);
+                    return RepoHelpers.SwitchOrder(notebooks, direction, n => n.UpdatedAt);
                 case "Name":
-                    return SwitchOrder(notebooks, direction, n => n.Name);
+                    return RepoHelpers.SwitchOrder(notebooks, direction, n => n.Name);
                 case "Description":
-                    return SwitchOrder(notebooks, direction, n => n.Description);
+                    return RepoHelpers.SwitchOrder(notebooks, direction, n => n.Description);
                 case "CreatedAt":
-                    return SwitchOrder(notebooks, direction, n => n.CreatedAt);
+                    return RepoHelpers.SwitchOrder(notebooks, direction, n => n.CreatedAt);
                 default:
                     return notebooks.OrderByDescending(n => n.UpdatedAt);
             }
-        }
-
-        private static IQueryable<Notebook> SwitchOrder<TKey>(IQueryable<Notebook> notebooks, string direction, Expression<Func<Notebook, TKey>> property)
-        {
-            if (direction == "DESC")
-                return notebooks.OrderByDescending(property);
-            else
-                return notebooks.OrderBy(property);
         }
     }
 }

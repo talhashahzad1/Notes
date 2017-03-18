@@ -4,21 +4,54 @@
     ViewData["Title"] = Model.Name;
 }
 
-<h2>@Model.Name</h2>
-<p>@Model.Description</p>
-<ul class="list-inline">
-    <li>
-        <b>Created</b>
-        @Model.CreatedAt
-    </li>
-    <li>
-        <b>Latest Update</b>
-        @Model.UpdatedAt
-    </li>
-</ul>
-<a asp-controller="Notes" asp-action="Create" asp-route-notebookId="@Model.Id">Add Note</a>
-<h3>Notes (@Model.Notes.Count())</h3>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="row">
+    <div class="col-md-12">
+        <a asp-action="Index">Back to List</a>
+        <h2>@Model.Name</h2>
+        <p>@Model.Description</p>
+        <ul class="list-inline">
+            <li>
+                <b>Created</b>
+                @Model.CreatedAt
+            </li>
+            <li>
+                <b>Latest Update</b>
+                @Model.UpdatedAt
+            </li>
+        </ul>
+        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        <h3>Notes (@Model.Notes.Count())</h3>
+        <a asp-controller="Notes" asp-action="Create" asp-route-notebookId="@Model.Id">Add Note</a>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Updated</th>
+                    <th>Created</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var note in Model.Notes)
+                {
+                    <tr>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@note.Id">@note.Name</a>
+                        </td>
+                        <td>@note.UpdatedAt</td>
+                        <td>@note.CreatedAt</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@note.Id">Edit</a> |
+                            <a asp-action="Delete" asp-route-id="@note.Id">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>

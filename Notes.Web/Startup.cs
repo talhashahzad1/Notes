@@ -16,6 +16,12 @@ using Notes.Web.Data.Repositories;
 
 namespace Notes.Web
 {
+    public class SetupUser
+    {
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+
     public class Startup
     {
         public Startup(IHostingEnvironment env)
@@ -48,6 +54,8 @@ namespace Notes.Web
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
+            services.Configure<SetupUser>(Configuration.GetSection("SetupUser"));
+
             services.AddMvc();
 
             // Add application services.
@@ -56,10 +64,11 @@ namespace Notes.Web
 
 
             services.AddScoped<NotebookRepository>();
+            services.AddSingleton<DbSeeder>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, DbSeeder seeder)
         {
             loggerFactory.AddProvider(new EFLoggerProvider());
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
@@ -96,6 +105,8 @@ namespace Notes.Web
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            seeder.Seed().Wait();
         }
     }
 }
