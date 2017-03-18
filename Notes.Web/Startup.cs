@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Notes.Web.Data;
 using Notes.Web.Models;
 using Notes.Web.Services;
+using Notes.Web.Data.Repositories;
 
 namespace Notes.Web
 {
@@ -52,6 +53,9 @@ namespace Notes.Web
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
+
+
+            services.AddScoped<NotebookRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

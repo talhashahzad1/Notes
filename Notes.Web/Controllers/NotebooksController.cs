@@ -10,6 +10,7 @@ using Notes.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Notes.Web.Models.CoreViewModels;
+using Notes.Web.Data.Repositories;
 
 namespace Notes.Web.Controllers
 {
@@ -18,20 +19,20 @@ namespace Notes.Web.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly NotebookRepository _repo;
 
         public NotebooksController(ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager, NotebookRepository repo)
         {
             _context = context;
+            _repo = repo;
             _userManager = userManager;
         }
         
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string order = "UpdatedAt", string direction = "DESC")
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            var notebooks = _context.Notebooks.Where(n => n.ApplicationUser == user).Include(n => n.Notes)
-                .OrderByDescending(n => n.UpdatedAt);
-            return View(await notebooks.ToListAsync());
+            return View(await _repo.List(user, order, direction));
         }
         
         public async Task<IActionResult> Details(int? id)
