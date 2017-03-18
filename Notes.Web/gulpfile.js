@@ -1,4 +1,5 @@
-﻿var gulp = require('gulp'),
+/// <binding BeforeBuild='build' />
+var gulp = require('gulp'),
     plumber = require("gulp-plumber"),
     sourceMaps = require("gulp-sourcemaps"),
     tsc = require("gulp-typescript"),
