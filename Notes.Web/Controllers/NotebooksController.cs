@@ -29,7 +29,8 @@ namespace Notes.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            var notebooks = _context.Notebooks.Where(n => n.ApplicationUser == user).Include(n => n.Notes).OrderByDescending(n => n.UpdatedAt);
+            var notebooks = _context.Notebooks.Where(n => n.ApplicationUser == user).Include(n => n.Notes)
+                .OrderByDescending(n => n.UpdatedAt);
             return View(await notebooks.ToListAsync());
         }
         
