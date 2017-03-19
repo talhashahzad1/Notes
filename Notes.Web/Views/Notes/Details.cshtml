@@ -1,48 +1,31 @@
-@model Notes.Web.Models.Note
+@model Note
 
 @{
     ViewData["Title"] = "Details";
 }
 
-<h2>Details</h2>
-
-<div>
-    <h4>Note</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Body)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Body)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CreatedAt)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.UpdatedAt)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.UpdatedAt)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Notebook)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Notebook.ApplicationUserId)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<h2>
+    @Model.Name
+    <small>
+        <a asp-action="Details" asp-controller="Notebooks" asp-route-id="@Model.NotebookId">@Model.Notebook.Name</a>
+    </small>
+</h2>
+<ul class="list-inline">
+    <li>
+        <b>Created</b>
+        @Model.CreatedAt
+    </li>
+    <li>
+        <b>Latest Update</b>
+        @Model.UpdatedAt
+    </li>
+    <li>
+        <a asp-action="Edit" asp-controller="Notes" asp-route-notebookId="@Model.NotebookId" asp-route-id="@Model.Id">Edit</a>
+    </li>
+    <li>
+        <a asp-action="Delete" asp-controller="Notes" asp-route-notebookId="@Model.NotebookId" asp-route-id="@Model.Id">Delete</a>
+    </li>
+</ul>
+<div class="note-body">
+    @Html.Raw(Model.Body)
 </div>

@@ -9,6 +9,7 @@ using Notes.Web.Data;
 using Notes.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Notes.Web.Models.CoreViewModels;
+using Markdig;
 
 namespace Notes.Web.Controllers
 {
@@ -43,7 +44,8 @@ namespace Notes.Web.Controllers
             {
                 return NotFound();
             }
-
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+            note.Body = Markdown.ToHtml(note.Body, pipeline);
             return View(note);
         }
         
