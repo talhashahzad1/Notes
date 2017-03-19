@@ -62,7 +62,7 @@ namespace Notes.Web.Controllers
                 note.NotebookId = notebookId;
                 _context.Add(note);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", new { NotebookId = notebookId, Id = note.Id });
             }
             return View(nfo);
         }
@@ -109,7 +109,7 @@ namespace Notes.Web.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", new { Id = note.Id });
             }
             return View(note);
         }
@@ -139,7 +139,7 @@ namespace Notes.Web.Controllers
             var note = await _context.Notes.SingleOrDefaultAsync(m => m.Id == id);
             _context.Notes.Remove(note);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Index");
+            return RedirectToAction("Details", "Notebooks", new { Id = note.NotebookId });
         }
 
         private bool NoteExists(int id)
