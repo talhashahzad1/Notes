@@ -71,6 +71,7 @@ namespace Notes.Web
 
 
             services.AddScoped<NotebookRepository>();
+            services.AddScoped<GutenTag>();
             services.AddSingleton<DbSeeder>();
         }
 

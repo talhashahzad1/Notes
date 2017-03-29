@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Notes.Web.Data;
 using Notes.Web.Models;
 using Microsoft.AspNetCore.Authorization;
+using Notes.Web.Models.CoreViewModels;
 
 namespace Notes.Web.Controllers
 {
@@ -52,15 +53,16 @@ namespace Notes.Web.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,CreatedAt")] Tag tag)
+        public async Task<IActionResult> Create(TagFormObject tfo)
         {
             if (ModelState.IsValid)
             {
+                var tag = tfo.CreateTag();
                 _context.Add(tag);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            return View(tag);
+            return View(tfo);
         }
         
         public async Task<IActionResult> Edit(int? id)
@@ -75,39 +77,22 @@ namespace Notes.Web.Controllers
             {
                 return NotFound();
             }
-            return View(tag);
+            return View(new TagFormObject(tag));
         }
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CreatedAt")] Tag tag)
+        public async Task<IActionResult> Edit(int id, TagFormObject tfo)
         {
-            if (id != tag.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(tag);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TagExists(tag.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                var tag = await _context.Tags.FindAsync(id);
+                tfo.UpdateTag(tag);
+                _context.Update(tag);
+                await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            return View(tag);
+            return View(tfo);
         }
         
         public async Task<IActionResult> Delete(int? id)

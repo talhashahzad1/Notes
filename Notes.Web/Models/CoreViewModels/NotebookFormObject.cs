@@ -18,10 +18,12 @@ namespace Notes.Web.Models.CoreViewModels
             ParentId = notebook.ParentId;
         }
 
+        public int Id { get; set; }
         [Required]
         public string Name { get; set; }
         public string Description { get; set; }
         public int? ParentId { get; set; }
+        public string TagList { get; set; }
 
         public Notebook ToNotebook()
         {

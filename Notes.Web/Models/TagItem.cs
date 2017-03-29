@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Notes.Web.Models.CoreViewModels;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace Notes.Web.Models
 
         [Required]
         public DateTime CreatedAt { get; set; }
+
     }
 
     public enum ItemType

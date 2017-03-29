@@ -10,6 +10,7 @@ using Notes.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Notes.Web.Models.CoreViewModels;
 using Markdig;
+using Notes.Web.Services;
 
 namespace Notes.Web.Controllers
 {
@@ -17,12 +18,14 @@ namespace Notes.Web.Controllers
     public class NotesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly GutenTag _gutenTag;
 
-        public NotesController(ApplicationDbContext context)
+        public NotesController(ApplicationDbContext context, GutenTag gutenTag)
         {
-            _context = context;    
+            _context = context;
+            _gutenTag = gutenTag;
         }
-        
+
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Notes.Include(n => n.Notebook);
@@ -48,27 +51,31 @@ namespace Notes.Web.Controllers
             note.Body = Markdown.ToHtml(note.Body, pipeline);
             return View(note);
         }
-        
+
         public IActionResult Create()
         {
             return View();
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(int notebookId, NoteFormObject nfo)
         {
             if (ModelState.IsValid)
             {
-                var note = nfo.ToNote();
+                var note = nfo.CreateNote();
                 note.NotebookId = notebookId;
                 _context.Add(note);
                 await _context.SaveChangesAsync();
+                if (!string.IsNullOrWhiteSpace(nfo.TagList))
+                {
+                    await _gutenTag.AddToDb(new TagHolder(note.Id, "Note", nfo.TagList));
+                }
                 return RedirectToAction("Details", new { NotebookId = notebookId, Id = note.Id });
             }
             return View(nfo);
         }
-        
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -81,41 +88,31 @@ namespace Notes.Web.Controllers
             {
                 return NotFound();
             }
-            return View(note);
+            var tagList = await _context.TagItems.Include(ti => ti.Tag)
+                .Where(ti => ti.ItemId == note.Id && ti.ItemType == ItemType.Note).ToListAsync();
+            return View(new NoteFormObject(note, tagList.Select(ti => ti.Tag.Name).ToList()));
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Note note)
+        public async Task<IActionResult> Edit(int id, NoteFormObject nfo)
         {
-            if (id != note.Id)
-            {
-                return NotFound();
-            }
+            var note = await _context.Notes.FindAsync(id);
 
             if (ModelState.IsValid)
             {
-                try
+                nfo.UpdateNote(note);
+                _context.Update(note);
+                await _context.SaveChangesAsync();
+                if (!string.IsNullOrWhiteSpace(nfo.TagList))
                 {
-                    _context.Update(note);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!NoteExists(note.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    await _gutenTag.AddToDb(new TagHolder(note.Id, "Note", nfo.TagList));
                 }
                 return RedirectToAction("Details", new { Id = note.Id });
             }
-            return View(note);
+            return View(nfo);
         }
-        
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -133,7 +130,7 @@ namespace Notes.Web.Controllers
 
             return View(note);
         }
-        
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
