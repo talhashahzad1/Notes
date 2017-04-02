@@ -47,7 +47,7 @@ namespace Notes.Web.Services
             // Create new tag if necessary
             if (tag == null)
             {
-                tag = new Tag { Name = name };
+                tag = new Tag { Name = name, CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now };
                 _db.Tags.Add(tag);
                 await _db.SaveChangesAsync();
             }
@@ -60,7 +60,8 @@ namespace Notes.Web.Services
             if (match == null)
             {
                 // Make tag item
-                match = new TagItem { ItemId = _tagHolder.ItemId, ItemType = _tagHolder.ItemType, TagId = tag.Id, CreatedAt = DateTime.Now };
+                match = new TagItem { ItemId = _tagHolder.ItemId, ItemType = _tagHolder.ItemType,
+                    TagId = tag.Id, CreatedAt = DateTime.Now };
                 _db.TagItems.Add(match);
                 await _db.SaveChangesAsync();
             }

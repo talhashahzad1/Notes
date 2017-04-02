@@ -36,14 +36,13 @@ namespace Notes.Web.Controllers
                 return NotFound();
             }
 
-            var tag = await _context.Tags
-                .SingleOrDefaultAsync(m => m.Id == id);
-            if (tag == null)
+            var tvm = await TagViewModel.WithAssociations((int)id, _context);
+            if (tvm == null)
             {
                 return NotFound();
             }
 
-            return View(tag);
+            return View(tvm);
         }
         
         public IActionResult Create()

@@ -1,28 +1,40 @@
-@model Notes.Web.Models.Tag
+@model TagViewModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = $"{Model.Name} Tag";
 }
 
-<h2>Details</h2>
+<h2>@Model.Name</h2>
 
 <div>
-    <h4>Tag</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CreatedAt)
-        </dd>
-    </dl>
+    @if (Model.Notes.Count > 0)
+    {
+        <h3>Notes</h3>
+        <table class="table table-striped">
+            @foreach (var note in Model.Notes)
+            {
+                <tr>
+                    <td>
+                        <a asp-action="Details" asp-controller="Notes" asp-route-id="@note.Id">@note.Name</a>
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+    @if (Model.Notebooks.Count > 0)
+    {
+        <h3>Notebooks</h3>
+        <table class="table table-striped">
+            @foreach (var notebook in Model.Notebooks)
+            {
+                <tr>
+                    <td>
+                        <a asp-action="Details" asp-controller="Notes" asp-route-id="@notebook.Id">@notebook.Name</a>
+                    </td>
+                </tr>
+            }
+        </table>
+    }
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
