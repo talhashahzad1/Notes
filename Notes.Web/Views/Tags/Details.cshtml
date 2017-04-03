@@ -7,7 +7,7 @@
 <h2>@Model.Name</h2>
 
 <div>
-    @if (Model.Notes.Count > 0)
+    @if (Model.Notes.Count() > 0)
     {
         <h3>Notes</h3>
         <table class="table table-striped">
@@ -21,7 +21,7 @@
             }
         </table>
     }
-    @if (Model.Notebooks.Count > 0)
+    @if (Model.Notebooks.Count() > 0)
     {
         <h3>Notebooks</h3>
         <table class="table table-striped">

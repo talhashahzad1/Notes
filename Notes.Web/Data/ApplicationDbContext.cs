@@ -20,6 +20,7 @@ namespace Notes.Web.Data
         public DbSet<Notebook> Notebooks { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<TagItem> TagItems { get; set; }
+        public DbSet<TagItemView> TagItemViews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
